@@ -1,6 +1,6 @@
 # 井字游戏（Tic-Tac-Toe）运行与开发指南
 
-**版本:** 1.2
+**版本:** 1.3.0
 
 **版权:** `yuanyuan5510` 保留所有权利
 
@@ -127,33 +127,43 @@ docker run -p 31480:31480 tic-tac-toe
 ---
 
 作者：[yuanyuan5510](https://github.com/yuanyuan5510)
-更新时间：2026-07-07
+更新时间：2026-07-08
 
-## 打包为 Windows 可执行文件（exe）
-该项目可以使用 `pkg` 将 Node.js 应用打包为单个可执行文件（包含 Node 运行时）。我们新增了一个启动器 `run_and_check.js`：打包后运行该 exe 会在终端中启动服务器、轮询确认服务可用，若服务正常会自动在默认浏览器打开服务页面。
+## 打包为可执行文件
+该项目可以使用 `pkg` 将 Node.js 应用打包为单个可执行文件（包含 Node 运行时）。我们新增了一个启动器 `run_and_check.js`：打包后运行该可执行文件会在终端中启动服务器、轮询确认服务可用，若服务正常会自动在默认浏览器打开服务页面。
 
-步骤：
+### 打包步骤
 
-```powershell
-# 安装 pkg（可全局或使用 npx）
-npm install -g pkg
-
-# 或使用 npx（无需全局安装）
-npx pkg . --out-path dist
-
-# 或使用项目脚本（已在 package.json 中添加）
+```bash
+# Linux x64（默认）
 npm run build:exe
+
+# Windows x64
+npm run build:exe:win
+
+# 或使用 npx 自定义目标平台
+npx pkg . --out-path dist --targets node18-linux-x64   # Linux x64
+npx pkg . --out-path dist --targets node18-win-x64     # Windows x64
+npx pkg . --out-path dist --targets node18-macos-x64   # macOS x64
 ```
 
-构建后，`dist/` 目录下会生成对应平台的可执行文件（如 `tic-tac-toe.exe`）。在 Windows 上，双击或在终端运行该 exe：
+### 运行方式
 
+**Linux/macOS：**
+```bash
+cd dist
+chmod +x tic-tac-toe   # 添加执行权限
+./tic-tac-toe
+```
+
+**Windows：**
 ```powershell
 .\dist\tic-tac-toe.exe
 ```
 
 该可执行文件将在终端输出启动日志，启动成功并通过轮询检测到 `http://localhost:<PORT>/zhu.html` 可访问后，会自动在默认浏览器打开该页面。若在限定时间内检测失败，会在终端展示错误提示并保留日志供排查。
 
-注意与限制：
-- `pkg` 有时会对动态 require 或某些本地模块打包行为有特殊要求；如果打包后的 exe 在运行时提示找不到文件，请检查代码中是否存在动态路径或在 `package.json` 中添加 `assets`/`scripts` 配置以包含静态资源。
-- 可执行文件包含运行时，体积较大，这是正常现象。
+### 注意与限制
+- `pkg` 有时会对动态 require 或某些本地模块打包行为有特殊要求；如果打包后的可执行文件在运行时提示找不到文件，请检查代码中是否存在动态路径或在 `package.json` 中添加 `assets`/`scripts` 配置以包含静态资源。
+- 可执行文件包含 Node.js 运行时，体积较大（约 40-50MB），这是正常现象。
 

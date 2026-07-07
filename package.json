@@ -8,7 +8,8 @@
     "start": "node 1.js",
     "build:config": "node scripts/generate-config.js",
     "build": "npm run build:config",
-    "build:exe": "pkg . --out-path dist --targets node18-win-x64"
+    "build:exe": "pkg . --out-path dist --targets node18-linux-x64",
+    "build:exe:win": "pkg . --out-path dist --targets node18-win-x64"
   },
   "engines": {
     "node": ">=16.0.0"
