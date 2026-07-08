@@ -122,7 +122,7 @@ docker run -p 31480:31480 tic-tac-toe
 
 ## 贡献与许可
 - 若要贡献：请先 fork 仓库并提交 PR，可添加 `CONTRIBUTING.md` 说明贡献流程。
-- 建议使用 MIT 或其他宽松开源许可证。
+- 本仓库采用GNU GENERAL PUBLIC LICENSE协议，您可以在 `LICENSE` 文件中查看详细内容。
 
 ---
 

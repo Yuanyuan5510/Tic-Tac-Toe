@@ -357,7 +357,13 @@ function startServer(portInput) {
         console.warn('检查或写入 public/socket.io.min.js 时发生错误：', e.message);
     }
     const server = http.createServer(app);
-    const io = socketIo(server);
+    const io = socketIo(server, {
+        cors: {
+            origin: true,
+            methods: ['GET', 'POST'],
+            credentials: true
+        }
+    });
 
     // 静态文件服务
     app.use(express.static(path.join(__dirname, 'public')));

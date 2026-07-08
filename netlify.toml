@@ -1,6 +1,6 @@
 [build]
   publish = "public"
-  command = "echo 'Netlify deploy static public directory'"
+  command = "npm run build"
 
 [dev]
   framework = "none"

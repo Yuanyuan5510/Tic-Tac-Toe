@@ -1,7 +1,8 @@
 console.log('public/1.js loaded');
 
 function init() {
-    const socket = io();
+    const socketServerUrl = window.SOCKET_SERVER_URL || undefined;
+    const socket = io(socketServerUrl);
 
     // 诊断日志：帮助排查打包后连接问题
     socket.on('connect', () => {
@@ -9,6 +10,9 @@ function init() {
     });
     socket.on('connect_error', (err) => {
         console.error('Socket 连接错误:', err);
+        if (!window.SOCKET_SERVER_URL) {
+            showToast('未检测到后端 Socket.IO 服务，Netlify 前端需要配置 window.SOCKET_SERVER_URL 指向后端地址。', 8000);
+        }
     });
     socket.on('disconnect', (reason) => {
         console.warn('Socket 已断开，原因：', reason);
