@@ -54,7 +54,6 @@ function init() {
         roomIdInput.value = roomId;
         isJoiningRoom = true;
         socket.emit('create-room', roomId);
-        currentRoomId = roomId;
         roomInputDiv.classList.add('hidden');
         waitingMessage.classList.remove('hidden');
     });
@@ -104,8 +103,7 @@ function init() {
         if (currentRoomId) {
             socket.emit('leave-room', currentRoomId);
         }
-        gameContainer.classList.add('hidden');
-        mainMenu.classList.remove('hidden');
+        resetToMainMenu();
     });
 
     // 单元格点击
@@ -134,7 +132,6 @@ function init() {
         isJoiningRoom = true;
         console.log('发送 join-game, roomId=', roomId);
         socket.emit('join-game', roomId);
-        currentRoomId = roomId;
         roomInputDiv.classList.add('hidden');
         waitingMessage.classList.remove('hidden');
     }
@@ -157,6 +154,22 @@ function init() {
         }, timeout);
     }
 
+    function resetToMainMenu() {
+        currentRoomId = '';
+        isCreator = false;
+        isJoiningRoom = false;
+        gameContainer.classList.add('hidden');
+        waitingMessage.classList.add('hidden');
+        opponentDisconnected.classList.add('hidden');
+        closeRoomBtn.classList.add('hidden');
+        restartButton.classList.add('hidden');
+        exitRoomBtn.classList.add('hidden');
+        roomInputDiv.classList.add('hidden');
+        roomListDiv.classList.add('hidden');
+        mainMenu.classList.remove('hidden');
+        resultDisplay.textContent = '';
+    }
+
     // 更新棋盘
     function updateBoard(board) {
         cells.forEach((cell, index) => {
@@ -172,6 +185,7 @@ function init() {
 
     // Socket 事件处理
     socket.on('waiting-for-player', (data) => {
+        currentRoomId = data.roomId || currentRoomId;
         playerSymbol = data.playerSymbol;
         // 服务端告知是否为创建者
         isCreator = !!data.isCreator;
@@ -188,6 +202,7 @@ function init() {
     });
 
     socket.on('game-started', (data) => {
+        currentRoomId = data.roomId || currentRoomId;
         playerSymbol = data.playerSymbol;
         // 服务端告知是否为创建者
         isCreator = !!data.isCreator;
@@ -212,21 +227,6 @@ function init() {
         statusDisplay.textContent = `当前玩家: ${data.currentPlayer}`;
     });
 
-    socket.on('game-over', (data) => {
-        updateBoard(data.board);
-        restartButton.classList.remove('hidden');
-
-        if (data.winner) {
-            if (data.winner === playerSymbol) {
-                resultDisplay.textContent = `恭喜！您赢了！`;
-            } else {
-                resultDisplay.textContent = `对手获胜！`;
-            }
-        } else {
-            resultDisplay.textContent = `游戏平局！`;
-        }
-    });
-
     socket.on('opponent-disconnected', () => {
         gameContainer.classList.add('hidden');
         opponentDisconnected.classList.remove('hidden');
@@ -235,21 +235,24 @@ function init() {
     socket.on('room-closed', (data) => {
         // 房间被关闭，所有玩家返回主菜单
         console.log('收到 room-closed', data);
-        currentRoomId = '';
-        isCreator = false;
-        gameContainer.classList.add('hidden');
-        waitingMessage.classList.add('hidden');
-        opponentDisconnected.classList.add('hidden');
-        exitRoomBtn.classList.add('hidden');
-        mainMenu.classList.remove('hidden');
-        closeRoomBtn.classList.add('hidden');
+        resetToMainMenu();
         showToast('房间已被关闭');
+    });
+
+    socket.on('room-left', () => {
+        console.log('收到 room-left, 已退出房间');
+        resetToMainMenu();
+        showToast('已退出房间');
     });
 
     socket.on('action-error', (data) => {
         const message = data && data.message ? data.message : '操作失败';
         console.warn('action-error', message);
         showToast(message);
+        if (isJoiningRoom) {
+            isJoiningRoom = false;
+            resetToMainMenu();
+        }
     });
 
     socket.on('game-restarted', () => {
@@ -324,8 +327,12 @@ function init() {
 
     // 在游戏结束时添加获胜方格的动画
     socket.on('game-over', (data) => {
-        updateBoard(data.board);
+        waitingMessage.classList.add('hidden');
+        gameContainer.classList.remove('hidden');
+        exitRoomBtn.classList.remove('hidden');
         restartButton.classList.remove('hidden');
+        restartButton.style.display = 'inline-block';
+        updateBoard(data.board);
 
         if (data.winner) {
             highlightWinningCells(data.board, data.winner);
