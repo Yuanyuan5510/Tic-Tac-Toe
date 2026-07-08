@@ -1,8 +1,7 @@
 console.log('public/1.js loaded');
 
 function init() {
-    const socketServerUrl = window.SOCKET_SERVER_URL || undefined;
-    const socket = io(socketServerUrl);
+    const socket = io();
 
     // 诊断日志：帮助排查打包后连接问题
     socket.on('connect', () => {
@@ -10,9 +9,6 @@ function init() {
     });
     socket.on('connect_error', (err) => {
         console.error('Socket 连接错误:', err);
-        if (!window.SOCKET_SERVER_URL) {
-            showToast('未检测到后端 Socket.IO 服务，Netlify 前端需要配置 window.SOCKET_SERVER_URL 指向后端地址。', 8000);
-        }
     });
     socket.on('disconnect', (reason) => {
         console.warn('Socket 已断开，原因：', reason);
@@ -274,7 +270,7 @@ function init() {
         const help = document.createElement('div');
         help.className = 'room-help';
         help.innerHTML = `
-            <strong>提示：</strong> 问题与反馈请联系wang.station@hotmail.com
+            <strong>提示：</strong> 在房间列表中找到“您的房间”并点击【加入】。加入后，页面底部会显示【关闭房间】按钮，房主才能关闭房间以释放名额。
         `;
         roomsContainer.appendChild(help);
         roomList.forEach(room => {
