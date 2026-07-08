@@ -270,7 +270,7 @@ function init() {
         const help = document.createElement('div');
         help.className = 'room-help';
         help.innerHTML = `
-            <strong>提示：</strong> 在房间列表中找到“您的房间”并点击【加入】。加入后，页面底部会显示【关闭房间】按钮，房主才能关闭房间以释放名额。
+            <strong>提示：</strong> 源代码仓库:https://github.com/Yuanyuan5510/Tic-Tac-Toe。
         `;
         roomsContainer.appendChild(help);
         roomList.forEach(room => {
