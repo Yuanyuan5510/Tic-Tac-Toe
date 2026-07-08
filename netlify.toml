@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+  command = "echo 'Netlify deploy static public directory'"
+
+[dev]
+  framework = "none"
+
+# 如果你希望将根路径直接指向 zhu.html，也可以将 public/index.html 作为默认入口。
